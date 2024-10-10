@@ -10,11 +10,14 @@ import cn.hutool.core.map.CaseInsensitiveMap;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import org.jooq.lambda.tuple.Tuple;
+import org.jooq.lambda.tuple.Tuple3;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -46,39 +49,39 @@ public class Main {
         if (args.length > 2) {
             format = args[2];
         }
-        Map<String, Map<String, Object>> sortedMap = grabMap(className);
+        Map<String, Tuple3<Class<?>, Object, Boolean>> sortedMap = grabMap(className);
         //System.out.println(filePath);
         File file = new File(filePath);
         file.createNewFile();
         BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
         if ("conf".equalsIgnoreCase(format)) {
-            for (Map.Entry<String, Map<String, Object>> entry : sortedMap.entrySet()) {
+            for (Map.Entry<String, Tuple3<Class<?>, Object, Boolean>> entry : sortedMap.entrySet()) {
                 String key = entry.getKey();
-                Map<String, Object> value = entry.getValue();
-                writer.write(entry.getKey() + "=" + value.get(key));
+                Tuple3<Class<?>, Object, Boolean> value = entry.getValue();
+                writer.write(key + "=" + value.v2);
                 writer.newLine();
             }
             writer.flush();
 
         } else if ("md".equalsIgnoreCase(format)) {
-            writer.write("|key|value|");
+            writer.write("|key|value|important|");
             writer.newLine();
-            writer.write("|---|---|");
+            writer.write("|---|---|---|");
             writer.newLine();
-            for (Map.Entry<String, Map<String, Object>> entry : sortedMap.entrySet()) {
+            for (Map.Entry<String, Tuple3<Class<?>, Object, Boolean>> entry : sortedMap.entrySet()) {
                 String key = entry.getKey();
-                Map<String, Object> value = entry.getValue();
-                writer.write("|" + entry.getKey() + "|" + value.get(key) + "|");
+                Tuple3<Class<?>, Object, Boolean> value = entry.getValue();
+                writer.write("|" + key + "|" + value.v2 + "|" + (value.v3 ? "y" : "") + "|");
                 writer.newLine();
             }
             writer.flush();
 
         } else if ("json".equalsIgnoreCase(format)) {
             JSONObject jsonObject = new JSONObject();
-            for (Map.Entry<String, Map<String, Object>> entry : sortedMap.entrySet()) {
+            for (Map.Entry<String, Tuple3<Class<?>, Object, Boolean>> entry : sortedMap.entrySet()) {
                 String key = entry.getKey();
-                Map<String, Object> value = entry.getValue();
-                jsonObject.set(key, value.get(key));
+                Tuple3<Class<?>, Object, Boolean> value = entry.getValue();
+                jsonObject.set(key, value.v2);
             }
 
             writer.write(JSONUtil.toJsonPrettyStr(jsonObject));
@@ -99,12 +102,12 @@ public class Main {
 //    }
 
 
-    public static Map<String, Map<String, Object>> grabMap(String className) throws IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException {
+    public static Map<String, Tuple3<Class<?>, Object, Boolean>> grabMap(String className) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         Class<?> clazz = Class.forName(className);
         Constructor<?> constructor = clazz.getConstructor();
         Object classInstance = constructor.newInstance();
         Field[] fields = clazz.getDeclaredFields();
-        Map<String, Map<String, Object>> unsortedMap = new HashMap<>();
+        Map<String, Tuple3<Class<?>, Object, Boolean>> unsortedMap = new HashMap<>();
         for (Field field : fields) {
             field.setAccessible(true);
             String key = field.getName();
@@ -118,23 +121,24 @@ public class Main {
 
                 value = field.get(classInstance);
             }
-            Map<String, Object> valueMap = new HashMap<>();
+            Tuple3<Class<?>, Object, Boolean> valueTuple;
 
             Class<?> fieldType = field.getType();
-            if(fieldType.equals(String.class)) {
+            boolean importantField = hasAnnotation(field, "org.apache.rocketmq.common.annotation.ImportantField");
+            if (fieldType.equals(String.class)) {
                 String valueStr = value != null ? value.toString() : "";
                 String userHome = System.getProperty("user.home");
                 valueStr = valueStr.replace("null/", "${ROCKETMQ_HOME}/");
                 valueStr = valueStr.replace(userHome, "${ROCKETMQ_HOME}");
-                valueMap.put(key, valueStr);
-            }else{
-                valueMap.put(key, value);
+                valueTuple = Tuple.tuple(fieldType, valueStr, importantField);
+            } else {
+                valueTuple = Tuple.tuple(fieldType, value, importantField);
             }
 
 
-            unsortedMap.put(key, valueMap);
+            unsortedMap.put(key, valueTuple);
         }
-        Map<String, Map<String, Object>> sortedMap = new TreeMap<>(unsortedMap);
+        Map<String, Tuple3<Class<?>, Object, Boolean>> sortedMap = new TreeMap<>(unsortedMap);
         return sortedMap;
 //        for (Map.Entry<String, Map<String,String>> entry : sortedMap.entrySet()) {
 //            String key = entry.getKey();
@@ -178,6 +182,24 @@ public class Main {
             return str;
         }
         return Character.toUpperCase(str.charAt(0)) + str.substring(1);
+    }
+
+    private static boolean hasAnnotation(Field field, String annotationClassName) {
+
+        Annotation[] fieldAnnotation = field.getAnnotations();
+        boolean f = false;
+        if (fieldAnnotation != null) {
+            for (Annotation a : fieldAnnotation) {
+                //System.out.println(a.annotationType().getCanonicalName());
+                if (annotationClassName.equalsIgnoreCase(a.annotationType().getCanonicalName())) {
+                    f = true;
+                    break;
+                }
+            }
+        }
+
+
+        return f;
     }
 
 }
