@@ -46,15 +46,15 @@ public class Main {
         if (args.length > 2) {
             format = args[2];
         }
-        Map<String, Map<String, String>> sortedMap = grabMap(className);
+        Map<String, Map<String, Object>> sortedMap = grabMap(className);
         //System.out.println(filePath);
         File file = new File(filePath);
         file.createNewFile();
         BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
         if ("conf".equalsIgnoreCase(format)) {
-            for (Map.Entry<String, Map<String, String>> entry : sortedMap.entrySet()) {
+            for (Map.Entry<String, Map<String, Object>> entry : sortedMap.entrySet()) {
                 String key = entry.getKey();
-                Map<String, String> value = entry.getValue();
+                Map<String, Object> value = entry.getValue();
                 writer.write(entry.getKey() + "=" + value.get(key));
                 writer.newLine();
             }
@@ -65,9 +65,9 @@ public class Main {
             writer.newLine();
             writer.write("|---|---|");
             writer.newLine();
-            for (Map.Entry<String, Map<String, String>> entry : sortedMap.entrySet()) {
+            for (Map.Entry<String, Map<String, Object>> entry : sortedMap.entrySet()) {
                 String key = entry.getKey();
-                Map<String, String> value = entry.getValue();
+                Map<String, Object> value = entry.getValue();
                 writer.write("|" + entry.getKey() + "|" + value.get(key) + "|");
                 writer.newLine();
             }
@@ -75,9 +75,9 @@ public class Main {
 
         } else if ("json".equalsIgnoreCase(format)) {
             JSONObject jsonObject = new JSONObject();
-            for (Map.Entry<String, Map<String, String>> entry : sortedMap.entrySet()) {
+            for (Map.Entry<String, Map<String, Object>> entry : sortedMap.entrySet()) {
                 String key = entry.getKey();
-                Map<String, String> value = entry.getValue();
+                Map<String, Object> value = entry.getValue();
                 jsonObject.set(key, value.get(key));
             }
 
@@ -99,12 +99,12 @@ public class Main {
 //    }
 
 
-    public static Map<String, Map<String, String>> grabMap(String className) throws IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException {
+    public static Map<String, Map<String, Object>> grabMap(String className) throws IllegalAccessException, ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException {
         Class<?> clazz = Class.forName(className);
         Constructor<?> constructor = clazz.getConstructor();
         Object classInstance = constructor.newInstance();
         Field[] fields = clazz.getDeclaredFields();
-        Map<String, Map<String, String>> unsortedMap = new HashMap<>();
+        Map<String, Map<String, Object>> unsortedMap = new HashMap<>();
         for (Field field : fields) {
             field.setAccessible(true);
             String key = field.getName();
@@ -118,18 +118,23 @@ public class Main {
 
                 value = field.get(classInstance);
             }
-            Map<String, String> valueMap = new HashMap<>();
+            Map<String, Object> valueMap = new HashMap<>();
 
-            String valueStr = value != null ? value.toString() : "";
-            String userHome = System.getProperty("user.home");
-            valueStr = valueStr.replace("null/", "${ROCKETMQ_HOME}/");
-            valueStr = valueStr.replace(userHome, "${ROCKETMQ_HOME}");
+            Class<?> fieldType = field.getType();
+            if(fieldType.equals(String.class)) {
+                String valueStr = value != null ? value.toString() : "";
+                String userHome = System.getProperty("user.home");
+                valueStr = valueStr.replace("null/", "${ROCKETMQ_HOME}/");
+                valueStr = valueStr.replace(userHome, "${ROCKETMQ_HOME}");
+                valueMap.put(key, valueStr);
+            }else{
+                valueMap.put(key, value);
+            }
 
 
-            valueMap.put(key, valueStr);
             unsortedMap.put(key, valueMap);
         }
-        Map<String, Map<String, String>> sortedMap = new TreeMap<>(unsortedMap);
+        Map<String, Map<String, Object>> sortedMap = new TreeMap<>(unsortedMap);
         return sortedMap;
 //        for (Map.Entry<String, Map<String,String>> entry : sortedMap.entrySet()) {
 //            String key = entry.getKey();
