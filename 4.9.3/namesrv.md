@@ -1,8 +1,8 @@
-|key|value|
-|---|---|
-|clusterTest|false|
-|configStorePath|${ROCKETMQ_HOME}/namesrv/namesrv.properties|
-|kvConfigPath|${ROCKETMQ_HOME}/namesrv/kvConfig.json|
-|orderMessageEnable|false|
-|productEnvName|center|
-|rocketmqHome||
+|key|value|important|
+|---|---|---|
+|clusterTest|false||
+|configStorePath|${ROCKETMQ_HOME}/namesrv/namesrv.properties||
+|kvConfigPath|${ROCKETMQ_HOME}/namesrv/kvConfig.json||
+|orderMessageEnable|false||
+|productEnvName|center||
+|rocketmqHome|||
