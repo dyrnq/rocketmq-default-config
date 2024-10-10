@@ -7,6 +7,8 @@ package com.dyrnq.sca;
 //import org.apache.rocketmq.proxy.config.ProxyConfig;
 
 import cn.hutool.core.map.CaseInsensitiveMap;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 
 import java.io.BufferedWriter;
@@ -16,23 +18,24 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
 public class Main {
-    static CaseInsensitiveMap<String, String> SKIP_MAP = new CaseInsensitiveMap<>();
+    static CaseInsensitiveMap<String, String> OVERWRITE_EMPTY_MAP = new CaseInsensitiveMap<>();
 
     static {
-        SKIP_MAP.put("brokerName", null);
-        SKIP_MAP.put("log", null);
-        SKIP_MAP.put("proxyName", null);
-        SKIP_MAP.put("localHostName", null);
-        SKIP_MAP.put("brokerIP1", null);
-        SKIP_MAP.put("brokerIP2", null);
-        SKIP_MAP.put("jraftConfig", null);
+        OVERWRITE_EMPTY_MAP.put("brokerName", null);
+        OVERWRITE_EMPTY_MAP.put("log", null);
+        OVERWRITE_EMPTY_MAP.put("proxyName", null);
+        OVERWRITE_EMPTY_MAP.put("localHostName", null);
+        OVERWRITE_EMPTY_MAP.put("brokerIP1", null);
+        OVERWRITE_EMPTY_MAP.put("brokerIP2", null);
+        OVERWRITE_EMPTY_MAP.put("jraftConfig", null);
     }
+
     public static void main(String[] args) throws ClassNotFoundException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, IOException {
 
         String className = args[0];
@@ -71,27 +74,14 @@ public class Main {
             writer.flush();
 
         } else if ("json".equalsIgnoreCase(format)) {
-            Class<?> clazz = Class.forName(className);
-            Constructor<?> constructor = clazz.getConstructor();
-            Object classInstance = constructor.newInstance();
-            Field[] fields = clazz.getDeclaredFields();
-            for (Field field : fields) {
-                field.setAccessible(true);
-                String key = field.getName();
-                if (SKIP_MAP.containsKey(key)) {
-                    if (!Modifier.isStatic(field.getModifiers())) {
-                        field.set(classInstance, "");
-                    }
-                }
+            JSONObject jsonObject = new JSONObject();
+            for (Map.Entry<String, Map<String, String>> entry : sortedMap.entrySet()) {
+                String key = entry.getKey();
+                Map<String, String> value = entry.getValue();
+                jsonObject.set(key, value.get(key));
             }
-//            System.out.println(JSONUtil.toJsonPrettyStr(classInstance));
 
-//            null/
-            String json = JSONUtil.toJsonPrettyStr(classInstance);
-            String userHome = System.getProperty("user.home");
-            json = json.replace("null/","${ROCKETMQ_HOME}/");
-            json = json.replace(userHome,"${ROCKETMQ_HOME}");
-            writer.write(json);
+            writer.write(JSONUtil.toJsonPrettyStr(jsonObject));
             writer.flush();
 
         } else {
@@ -118,8 +108,11 @@ public class Main {
         for (Field field : fields) {
             field.setAccessible(true);
             String key = field.getName();
+            if (!hasPublicSetter(clazz, field)) {
+                continue;
+            }
             Object value = "";
-            if (SKIP_MAP.containsKey(key)) {
+            if (OVERWRITE_EMPTY_MAP.containsKey(key)) {
 
             } else {
 
@@ -129,9 +122,8 @@ public class Main {
 
             String valueStr = value != null ? value.toString() : "";
             String userHome = System.getProperty("user.home");
-            valueStr = valueStr.replace("null/","${ROCKETMQ_HOME}/");
-            valueStr = valueStr.replace(userHome,"${ROCKETMQ_HOME}");
-
+            valueStr = valueStr.replace("null/", "${ROCKETMQ_HOME}/");
+            valueStr = valueStr.replace(userHome, "${ROCKETMQ_HOME}");
 
 
             valueMap.put(key, valueStr);
@@ -146,5 +138,42 @@ public class Main {
 //            System.out.println(entry.getKey() + "=" + value.get(key));
 //        }
     }
+
+    public static boolean hasPublicSetter(Class<?> clazz, Field field) {
+        String propertyName = field.getName();
+        Class<?> fieldType = field.getType();
+        if (clazz.getName().equalsIgnoreCase("org.apache.rocketmq.common.BrokerConfig")) {
+            if ("defaultMessageRequestMode".equalsIgnoreCase(propertyName)) {
+                fieldType = String.class;
+            }
+        }
+
+
+        String setterName = "set" + capitalize(propertyName);
+
+        try {
+            Method method = clazz.getMethod(setterName, fieldType);
+            return method != null;
+        } catch (NoSuchMethodException e) {
+            if (propertyName.startsWith("is")) {
+                try {
+                    setterName = StrUtil.replaceFirst(propertyName, "is", "set");
+                    Method method = clazz.getMethod(setterName, fieldType);
+                    return method != null;
+                } catch (NoSuchMethodException e1) {
+                    return false;
+                }
+            }
+            return false;
+        }
+    }
+
+    private static String capitalize(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+        return Character.toUpperCase(str.charAt(0)) + str.substring(1);
+    }
+
 }
 
