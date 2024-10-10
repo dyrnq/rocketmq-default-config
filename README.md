@@ -117,3 +117,26 @@ To solve similar problems like [Documentation Related: Is there a page listing a
   - [5.3.0/proxy.json](5.3.0/proxy.json)
   - [5.3.0/proxy.md](5.3.0/proxy.md)
 <!-- /TOC -->
+
+## build and run local
+
+### clone project
+
+```bash
+git clone git@github.com:dyrnq/rocketmq-default-config.git
+cd rocketmq-default-config
+```
+
+### build
+
+```bash
+## build current version
+./mvnw clean package
+
+## gen all version
+./run.sh
+
+## gen specific version
+./run.sh --ver 5.3.0
+
+```
