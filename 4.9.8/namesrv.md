@@ -1,0 +1,10 @@
+|key|value|
+|---|---|
+|clusterTest|false|
+|configBlackList|configBlackList;configStorePath;kvConfigPath|
+|configStorePath|${ROCKETMQ_HOME}/namesrv/namesrv.properties|
+|kvConfigPath|${ROCKETMQ_HOME}/namesrv/kvConfig.json|
+|log||
+|orderMessageEnable|false|
+|productEnvName|center|
+|rocketmqHome||
