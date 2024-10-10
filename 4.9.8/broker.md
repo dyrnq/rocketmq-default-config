@@ -45,7 +45,6 @@
 |heartbeatThreadPoolQueueCapacity|50000|
 |highSpeedMode|false|
 |isolateLogEnable|false|
-|log||
 |longPollingEnable|true|
 |maxDelayTime|40|
 |maxErrorRateOfBloomFilter|20|

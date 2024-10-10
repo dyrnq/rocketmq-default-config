@@ -1,7 +1,5 @@
 |key|value|
 |---|---|
-|DLEDGER_CONTROLLER|DLedger|
-|JRAFT_CONTROLLER|jRaft|
 |configBlackList|configBlackList;configStorePath|
 |configStorePath|${ROCKETMQ_HOME}/controller/controller.properties|
 |controllerDLegerGroup||

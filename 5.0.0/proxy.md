@@ -1,13 +1,10 @@
 |key|value|
 |---|---|
-|DEFAULT_CONFIG_FILE_NAME|rmq-proxy.json|
-|PROCESSOR_NUMBER|4|
 |brokerConfigPath|${ROCKETMQ_HOME}/conf/broker.conf|
 |channelExpiredInSeconds|60|
 |consumerProcessorThreadPoolNums|4|
 |consumerProcessorThreadPoolQueueCapacity|10000|
 |contextExpiredInSeconds|30|
-|delayLevelTable|{}|
 |enableACL|false|
 |enableGrpcEpoll|false|
 |enablePrintJstack|true|
@@ -42,7 +39,6 @@
 |grpcWorkerLoopNum|8|
 |invisibleTimeMillisWhenClear|1000|
 |lockTimeoutMsInHandleGroup|3000|
-|log||
 |longPollingReserveTimeInMillis|100|
 |maxDelayTimeMills|86400000|
 |maxInvisibleTimeMills|43200000|

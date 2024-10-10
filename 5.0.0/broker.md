@@ -1,6 +1,5 @@
 |key|value|
 |---|---|
-|PROCESSOR_NUMBER|4|
 |accountStatsEnable|true|
 |accountStatsPrintZeroValues|true|
 |ackMessageThreadPoolNums|3|
@@ -71,7 +70,6 @@
 |loadBalanceProcessorThreadPoolNums|32|
 |loadBalanceThreadPoolQueueCapacity|100000|
 |lockInStrictMode|false|
-|log||
 |longPollingEnable|true|
 |maxDelayTime|40|
 |maxErrorRateOfBloomFilter|20|

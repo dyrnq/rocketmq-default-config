@@ -1,8 +1,5 @@
 |key|value|
 |---|---|
-|DEFAULT_CLUSTER_NAME|DefaultCluster|
-|DEFAULT_CONFIG_FILE_NAME|rmq-proxy.json|
-|PROCESSOR_NUMBER|4|
 |aclCacheExpiredSeconds|300|
 |aclCacheMaxNum|20000|
 |aclCacheRefreshSeconds|20|
@@ -13,7 +10,6 @@
 |consumerProcessorThreadPoolQueueCapacity|10000|
 |contextExpiredInSeconds|30|
 |defaultInvisibleTimeMills|60000|
-|delayLevelTable|{}|
 |detectInterval|2000|
 |detectTimeout|200|
 |enableACL|false|
@@ -55,11 +51,9 @@
 |heartbeatSyncerTopicClusterName||
 |heartbeatSyncerTopicName|DefaultHeartBeatSyncerTopic|
 |invisibleTimeMillisWhenClear|1000|
-|localHostName||
 |localProxyConnectTimeoutMs|3000|
 |localServeAddr||
 |lockTimeoutMsInHandleGroup|3000|
-|log||
 |longPollingReserveTimeInMillis|100|
 |maxDelayTimeMills|86400000|
 |maxInvisibleTimeMills|43200000|

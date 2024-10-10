@@ -1,6 +1,5 @@
 |key|value|
 |---|---|
-|PROCESSOR_NUMBER|4|
 |accountStatsEnable|true|
 |accountStatsPrintZeroValues|true|
 |ackMessageThreadPoolNums|16|
