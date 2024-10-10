@@ -36,7 +36,7 @@ public class Main {
         OVERWRITE_EMPTY_MAP.put("localHostName", null);
         OVERWRITE_EMPTY_MAP.put("brokerIP1", null);
         OVERWRITE_EMPTY_MAP.put("brokerIP2", null);
-        OVERWRITE_EMPTY_MAP.put("jraftConfig", null);
+//        OVERWRITE_EMPTY_MAP.put("jraftConfig", null);
     }
 
     public static void main(String[] args) throws ClassNotFoundException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException, IOException {
@@ -138,6 +138,16 @@ public class Main {
 
             unsortedMap.put(key, valueTuple);
         }
+
+        //jraftConfig
+        if ("org.apache.rocketmq.common.ControllerConfig".equalsIgnoreCase(className)){
+            unsortedMap.remove("jraftConfig");
+            Map<String, Tuple3<Class<?>, Object, Boolean>> jraftConfig = grabMap("org.apache.rocketmq.common.JraftConfig");
+            for (Map.Entry<String, Tuple3<Class<?>, Object, Boolean>> entry : jraftConfig.entrySet()) {
+                unsortedMap.put(entry.getKey(), entry.getValue());
+            }
+        }
+
         Map<String, Tuple3<Class<?>, Object, Boolean>> sortedMap = new TreeMap<>(unsortedMap);
         return sortedMap;
 //        for (Map.Entry<String, Map<String,String>> entry : sortedMap.entrySet()) {
@@ -167,6 +177,14 @@ public class Main {
             if (propertyName.startsWith("is")) {
                 try {
                     setterName = StrUtil.replaceFirst(propertyName, "is", "set");
+                    Method method = clazz.getMethod(setterName, fieldType);
+                    return method != null;
+                } catch (NoSuchMethodException e1) {
+                    return false;
+                }
+            }else if(propertyName.startsWith("jRaft")){
+                try {
+                    setterName = StrUtil.replaceFirst(propertyName, "jRaft", "setjRaft");
                     Method method = clazz.getMethod(setterName, fieldType);
                     return method != null;
                 } catch (NoSuchMethodException e1) {
