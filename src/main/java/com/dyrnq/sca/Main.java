@@ -146,6 +146,8 @@ public class Main {
             for (Map.Entry<String, Tuple3<Class<?>, Object, Boolean>> entry : jraftConfig.entrySet()) {
                 unsortedMap.put(entry.getKey(), entry.getValue());
             }
+            unsortedMap.put("processReadEvent",unsortedMap.get("isProcessReadEvent"));
+            unsortedMap.remove("isProcessReadEvent");
         }
 
         Map<String, Tuple3<Class<?>, Object, Boolean>> sortedMap = new TreeMap<>(unsortedMap);
