@@ -1,7 +1,7 @@
 |key|value|important|
 |---|---|---|
 |configBlackList|configBlackList;configStorePath||
-|configStorePath|${ROCKETMQ_HOME}/controller/controller.properties||
+|configStorePath|${user.home}/controller/controller.properties||
 |controllerDLegerGroup|||
 |controllerDLegerPeers|||
 |controllerDLegerSelfId|||
