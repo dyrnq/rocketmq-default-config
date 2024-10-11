@@ -7,6 +7,7 @@ package com.dyrnq.sca;
 //import org.apache.rocketmq.proxy.config.ProxyConfig;
 
 import cn.hutool.core.map.CaseInsensitiveMap;
+import cn.hutool.core.util.ReflectUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -103,6 +104,15 @@ public class Main {
 
 
     public static Map<String, Tuple3<Class<?>, Object, Boolean>> grabMap(String className) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        if ("org.apache.rocketmq.proxy.config.ProxyConfig".equalsIgnoreCase(className)) {
+            try {
+                Class<?> clazzConfigurationManager = Class.forName("org.apache.rocketmq.proxy.config.ConfigurationManager");
+                ReflectUtil.invokeStatic(clazzConfigurationManager.getMethod("initEnv"));
+                //ReflectUtil.invokeStatic(clazzConfigurationManager.getMethod("intConfig"));
+            } catch (Exception e) {
+
+            }
+        }
         Class<?> clazz = Class.forName(className);
         Constructor<?> constructor = clazz.getConstructor();
         Object classInstance = constructor.newInstance();

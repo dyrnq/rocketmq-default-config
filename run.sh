@@ -28,7 +28,7 @@ function genConfig() {
         # download_link=${download_link/archive.apache.org/files.m.daocloud.io/archive.apache.org};
         echo "download rocketmq-all-${rocketmq_ver}-bin-release.zip from ${download_link}"
         if command -v aria2c >/dev/null 2>&1; then
-            aria2c -x 16 -s 16 -k 1M "${download_link}"
+            aria2c --continue -x 16 -s 16 -k 1M "${download_link}"
         else
             curl -C - --retry 3 --retry-delay 1 -fSL# -O "${download_link}"
         fi
@@ -52,11 +52,11 @@ function genConfig() {
         fileName=$(cut -d: -f2 <<< "${x}")
         if "${rocketmq_path}"/bin/tools.sh com.dyrnq.sca.Check ${className} >/dev/null 2>&1; then
             if [ "${fileName}" = "proxy" ]; then
-                "${rocketmq_path}"/bin/tools.sh com.dyrnq.sca.Main ${className} $SCRIPT_DIR/$rocketmq_ver/"${fileName}".json json
+                ROCKETMQ_HOME="\${ROCKETMQ_HOME}" "${rocketmq_path}"/bin/tools.sh com.dyrnq.sca.Main ${className} $SCRIPT_DIR/$rocketmq_ver/"${fileName}".json json
             else
-                "${rocketmq_path}"/bin/tools.sh com.dyrnq.sca.Main ${className} $SCRIPT_DIR/$rocketmq_ver/"${fileName}".conf conf
+                ROCKETMQ_HOME="\${ROCKETMQ_HOME}" "${rocketmq_path}"/bin/tools.sh com.dyrnq.sca.Main ${className} $SCRIPT_DIR/$rocketmq_ver/"${fileName}".conf conf
             fi
-            "${rocketmq_path}"/bin/tools.sh com.dyrnq.sca.Main ${className} $SCRIPT_DIR/$rocketmq_ver/"${fileName}".md md
+            ROCKETMQ_HOME="\${ROCKETMQ_HOME}" "${rocketmq_path}"/bin/tools.sh com.dyrnq.sca.Main ${className} $SCRIPT_DIR/$rocketmq_ver/"${fileName}".md md
         else
             echo "${className} ${rocketmq_ver} ERROR"
         fi
