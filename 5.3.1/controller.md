@@ -11,7 +11,6 @@
 |controllerType|DLedger||
 |electMasterMaxRetryCount|3||
 |enableElectUncleanMaster|false||
-|isProcessReadEvent|false||
 |jRaftControllerRPCAddr|localhost:9770,localhost:9771,localhost:9772||
 |jRaftElectionTimeoutMs|1000||
 |jRaftGroupId|jRaft-Controller||
@@ -31,6 +30,7 @@
 |metricsPromExporterHost|||
 |metricsPromExporterPort|5557||
 |notifyBrokerRoleChanged|true||
+|processReadEvent|false||
 |rocketmqHome|||
 |scanInactiveMasterInterval|5000||
 |scanNotActiveBrokerInterval|5000||
