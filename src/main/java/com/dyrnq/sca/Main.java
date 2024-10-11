@@ -12,7 +12,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import org.jooq.lambda.tuple.Tuple;
-import org.jooq.lambda.tuple.Tuple3;
+import org.jooq.lambda.tuple.Tuple4;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -46,42 +46,55 @@ public class Main {
         String filePath = args[1];
 
         String format = "conf";
-
+        String configUrl = null;
         if (args.length > 2) {
             format = args[2];
         }
-        Map<String, Tuple3<Class<?>, Object, Boolean>> sortedMap = grabMap(className);
+        if (args.length > 3) {
+            configUrl = args[3];
+        }
+
+        Map<String, Tuple4<Class<?>, Object, Boolean, String>> sortedMap = grabMap(className, configUrl);
         //System.out.println(filePath);
         File file = new File(filePath);
         file.createNewFile();
         BufferedWriter writer = new BufferedWriter(new FileWriter(filePath));
         if ("conf".equalsIgnoreCase(format)) {
-            for (Map.Entry<String, Tuple3<Class<?>, Object, Boolean>> entry : sortedMap.entrySet()) {
+            for (Map.Entry<String, Tuple4<Class<?>, Object, Boolean, String>> entry : sortedMap.entrySet()) {
                 String key = entry.getKey();
-                Tuple3<Class<?>, Object, Boolean> value = entry.getValue();
+                Tuple4<Class<?>, Object, Boolean, String> value = entry.getValue();
                 writer.write(key + "=" + value.v2);
                 writer.newLine();
             }
             writer.flush();
 
         } else if ("md".equalsIgnoreCase(format)) {
-            writer.write("|key|value|important|");
+            writer.write("|key|value|important|describe|");
             writer.newLine();
-            writer.write("|---|---|---|");
+            writer.write("|---|---|---|---|");
             writer.newLine();
-            for (Map.Entry<String, Tuple3<Class<?>, Object, Boolean>> entry : sortedMap.entrySet()) {
+            for (Map.Entry<String, Tuple4<Class<?>, Object, Boolean, String>> entry : sortedMap.entrySet()) {
                 String key = entry.getKey();
-                Tuple3<Class<?>, Object, Boolean> value = entry.getValue();
-                writer.write("|" + key + "|" + value.v2 + "|" + (value.v3 ? "y" : "") + "|");
+                Tuple4<Class<?>, Object, Boolean, String> value = entry.getValue();
+
+                String cpuRelated = null;
+                if (value.v4 != null) {
+                    if (
+                            StrUtil.contains(value.v4, "Runtime") || StrUtil.contains(value.v4, "PROCESSOR_NUMBER")
+                    ) {
+                        cpuRelated = value.v4;
+                    }
+                }
+                writer.write("|" + key + "|" + (value.v2) + "|" + (value.v3 ? "y" : "") + "|" + (cpuRelated != null ? cpuRelated : "") + "|");
                 writer.newLine();
             }
             writer.flush();
 
         } else if ("json".equalsIgnoreCase(format)) {
             JSONObject jsonObject = new JSONObject();
-            for (Map.Entry<String, Tuple3<Class<?>, Object, Boolean>> entry : sortedMap.entrySet()) {
+            for (Map.Entry<String, Tuple4<Class<?>, Object, Boolean, String>> entry : sortedMap.entrySet()) {
                 String key = entry.getKey();
-                Tuple3<Class<?>, Object, Boolean> value = entry.getValue();
+                Tuple4<Class<?>, Object, Boolean, String> value = entry.getValue();
                 jsonObject.set(key, value.v2);
             }
 
@@ -103,7 +116,7 @@ public class Main {
 //    }
 
 
-    public static Map<String, Tuple3<Class<?>, Object, Boolean>> grabMap(String className) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public static Map<String, Tuple4<Class<?>, Object, Boolean, String>> grabMap(String className, String configUrl) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         if ("org.apache.rocketmq.proxy.config.ProxyConfig".equalsIgnoreCase(className)) {
             try {
                 Class<?> clazzConfigurationManager = Class.forName("org.apache.rocketmq.proxy.config.ConfigurationManager");
@@ -117,7 +130,7 @@ public class Main {
         Constructor<?> constructor = clazz.getConstructor();
         Object classInstance = constructor.newInstance();
         Field[] fields = clazz.getDeclaredFields();
-        Map<String, Tuple3<Class<?>, Object, Boolean>> unsortedMap = new HashMap<>();
+        Map<String, Tuple4<Class<?>, Object, Boolean, String>> unsortedMap = new HashMap<>();
         for (Field field : fields) {
             field.setAccessible(true);
             String key = field.getName();
@@ -131,7 +144,13 @@ public class Main {
 
                 value = field.get(classInstance);
             }
-            Tuple3<Class<?>, Object, Boolean> valueTuple;
+
+            String code = null;
+            if (configUrl != null) {
+                code = SourceUtil.readSource(configUrl, field.getName());
+            }
+
+            Tuple4<Class<?>, Object, Boolean, String> valueTuple;
 
             Class<?> fieldType = field.getType();
             boolean importantField = hasAnnotation(field, "org.apache.rocketmq.common.annotation.ImportantField");
@@ -140,9 +159,9 @@ public class Main {
                 String userHome = System.getProperty("user.home");
                 valueStr = valueStr.replace("null/", "${ROCKETMQ_HOME}/");
                 valueStr = valueStr.replace(userHome, "${user.home}");
-                valueTuple = Tuple.tuple(fieldType, valueStr, importantField);
+                valueTuple = Tuple.tuple(fieldType, valueStr, importantField, code);
             } else {
-                valueTuple = Tuple.tuple(fieldType, value, importantField);
+                valueTuple = Tuple.tuple(fieldType, value, importantField, code);
             }
 
 
@@ -150,17 +169,23 @@ public class Main {
         }
 
         //jraftConfig
-        if ("org.apache.rocketmq.common.ControllerConfig".equalsIgnoreCase(className)){
+        if ("org.apache.rocketmq.common.ControllerConfig".equalsIgnoreCase(className)) {
             unsortedMap.remove("jraftConfig");
-            Map<String, Tuple3<Class<?>, Object, Boolean>> jraftConfig = grabMap("org.apache.rocketmq.common.JraftConfig");
-            for (Map.Entry<String, Tuple3<Class<?>, Object, Boolean>> entry : jraftConfig.entrySet()) {
+            String JraftConfigUrl = null;
+            if (configUrl != null) {
+                JraftConfigUrl = StrUtil.replace(configUrl, "ControllerConfig", "JraftConfig");
+            } else {
+                JraftConfigUrl = null;
+            }
+            Map<String, Tuple4<Class<?>, Object, Boolean, String>> jraftConfig = grabMap("org.apache.rocketmq.common.JraftConfig", JraftConfigUrl);
+            for (Map.Entry<String, Tuple4<Class<?>, Object, Boolean, String>> entry : jraftConfig.entrySet()) {
                 unsortedMap.put(entry.getKey(), entry.getValue());
             }
-            unsortedMap.put("processReadEvent",unsortedMap.get("isProcessReadEvent"));
+            unsortedMap.put("processReadEvent", unsortedMap.get("isProcessReadEvent"));
             unsortedMap.remove("isProcessReadEvent");
         }
 
-        Map<String, Tuple3<Class<?>, Object, Boolean>> sortedMap = new TreeMap<>(unsortedMap);
+        Map<String, Tuple4<Class<?>, Object, Boolean, String>> sortedMap = new TreeMap<>(unsortedMap);
         return sortedMap;
 //        for (Map.Entry<String, Map<String,String>> entry : sortedMap.entrySet()) {
 //            String key = entry.getKey();
@@ -194,7 +219,7 @@ public class Main {
                 } catch (NoSuchMethodException e1) {
                     return false;
                 }
-            }else if(propertyName.startsWith("jRaft")){
+            } else if (propertyName.startsWith("jRaft")) {
                 try {
                     setterName = StrUtil.replaceFirst(propertyName, "jRaft", "setjRaft");
                     Method method = clazz.getMethod(setterName, fieldType);

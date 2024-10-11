@@ -27,6 +27,21 @@ function genConfig() {
         download_link="https://archive.apache.org/dist/rocketmq/${rocketmq_ver}/rocketmq-all-${rocketmq_ver}-bin-release.zip"
         # download_link=${download_link/archive.apache.org/files.m.daocloud.io/archive.apache.org};
         echo "download rocketmq-all-${rocketmq_ver}-bin-release.zip from ${download_link}"
+
+        BrokerConfig_java="https://github.com/apache/rocketmq/raw/rocketmq-all-${rocketmq_ver}/common/src/main/java/org/apache/rocketmq/common/BrokerConfig.java"
+        ProxyConfig_java="https://github.com/apache/rocketmq/raw/rocketmq-all-${rocketmq_ver}/proxy/src/main/java/org/apache/rocketmq/proxy/config/ProxyConfig.java"
+        NamesrvConfig_java="https://github.com/apache/rocketmq/raw/rocketmq-all-${rocketmq_ver}/common/src/main/java/org/apache/rocketmq/common/namesrv/NamesrvConfig.java"
+        ControllerConfig_java="https://github.com/apache/rocketmq/raw/rocketmq-all-${rocketmq_ver}/common/src/main/java/org/apache/rocketmq/common/ControllerConfig.java"
+        JraftConfig_java="https://github.com/apache/rocketmq/raw/rocketmq-all-${rocketmq_ver}/common/src/main/java/org/apache/rocketmq/common/JraftConfig.java"
+
+        if [ -z "${JAVA_HOME_8_X64}" ]; then
+          BrokerConfig_java="${BrokerConfig_java/github.com/ghp.ci/github.com}"
+          ProxyConfig_java="${ProxyConfig_java/github.com/ghp.ci/github.com}"
+          NamesrvConfig_java="${NamesrvConfig_java/github.com/ghp.ci/github.com}"
+          ControllerConfig_java="${ControllerConfig_java/github.com/ghp.ci/github.com}"
+          JraftConfig_java="${JraftConfig_java/github.com/ghp.ci/github.com}"
+        fi
+
         if command -v aria2c >/dev/null 2>&1; then
             aria2c --continue -x 16 -s 16 -k 1M "${download_link}"
         else
@@ -50,13 +65,15 @@ function genConfig() {
         for x in "org.apache.rocketmq.common.namesrv.NamesrvConfig:namesrv" "org.apache.rocketmq.common.BrokerConfig:broker" "org.apache.rocketmq.common.ControllerConfig:controller" "org.apache.rocketmq.proxy.config.ProxyConfig:proxy"; do
         className=$(cut -d: -f1 <<< "${x}")
         fileName=$(cut -d: -f2 <<< "${x}")
+        lastName=$(echo "${className}" | rev | cut -d. -f1 | rev)
+        lastName_java="${lastName}_java"
         if "${rocketmq_path}"/bin/tools.sh com.dyrnq.sca.Check ${className} >/dev/null 2>&1; then
             if [ "${fileName}" = "proxy" ]; then
                 ROCKETMQ_HOME="\${ROCKETMQ_HOME}" "${rocketmq_path}"/bin/tools.sh com.dyrnq.sca.Main ${className} $SCRIPT_DIR/$rocketmq_ver/"${fileName}".json json
             else
                 ROCKETMQ_HOME="\${ROCKETMQ_HOME}" "${rocketmq_path}"/bin/tools.sh com.dyrnq.sca.Main ${className} $SCRIPT_DIR/$rocketmq_ver/"${fileName}".conf conf
             fi
-            ROCKETMQ_HOME="\${ROCKETMQ_HOME}" "${rocketmq_path}"/bin/tools.sh com.dyrnq.sca.Main ${className} $SCRIPT_DIR/$rocketmq_ver/"${fileName}".md md
+            ROCKETMQ_HOME="\${ROCKETMQ_HOME}" "${rocketmq_path}"/bin/tools.sh com.dyrnq.sca.Main ${className} $SCRIPT_DIR/$rocketmq_ver/"${fileName}".md md "${!lastName_java}"
         else
             echo "${className} ${rocketmq_ver} ERROR"
         fi
