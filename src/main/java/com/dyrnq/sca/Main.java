@@ -139,7 +139,7 @@ public class Main {
                 String valueStr = value != null ? value.toString() : "";
                 String userHome = System.getProperty("user.home");
                 valueStr = valueStr.replace("null/", "${ROCKETMQ_HOME}/");
-                valueStr = valueStr.replace(userHome, "${ROCKETMQ_HOME}");
+                valueStr = valueStr.replace(userHome, "${user.home}");
                 valueTuple = Tuple.tuple(fieldType, valueStr, importantField);
             } else {
                 valueTuple = Tuple.tuple(fieldType, value, importantField);
