@@ -69,7 +69,7 @@ public class Main {
             writer.flush();
 
         } else if ("md".equalsIgnoreCase(format)) {
-            writer.write("|key|value|important|describe|");
+            writer.write("|key|value|important|description|");
             writer.newLine();
             writer.write("|---|---|---|---|");
             writer.newLine();
