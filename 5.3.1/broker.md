@@ -141,7 +141,7 @@
 |reviveMaxSlow|3||
 |reviveQueueNum|8||
 |reviveScanTime|10000||
-|rocketmqHome|||
+|rocketmqHome|${ROCKETMQ_HOME}||
 |sendHeartbeatTimeoutMillis|1000||
 |sendMessageThreadPoolNums|4||
 |sendThreadPoolQueueCapacity|10000||

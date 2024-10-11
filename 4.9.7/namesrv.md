@@ -5,4 +5,4 @@
 |kvConfigPath|${ROCKETMQ_HOME}/namesrv/kvConfig.json||
 |orderMessageEnable|false||
 |productEnvName|center||
-|rocketmqHome|||
+|rocketmqHome|${ROCKETMQ_HOME}||

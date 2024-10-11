@@ -31,6 +31,6 @@
 |metricsPromExporterPort|5557||
 |notifyBrokerRoleChanged|true||
 |processReadEvent|false||
-|rocketmqHome|||
+|rocketmqHome|${ROCKETMQ_HOME}||
 |scanInactiveMasterInterval|5000||
 |scanNotActiveBrokerInterval|5000||

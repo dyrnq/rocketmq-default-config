@@ -17,7 +17,7 @@
 |orderMessageEnable|false||
 |productEnvName|center||
 |returnOrderTopicConfigToBroker|true||
-|rocketmqHome|||
+|rocketmqHome|${ROCKETMQ_HOME}||
 |scanNotActiveBrokerInterval|5000||
 |supportActingMaster|false||
 |unRegisterBrokerQueueCapacity|3000||

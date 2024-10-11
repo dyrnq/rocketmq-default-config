@@ -64,7 +64,7 @@
 |registerNameServerPeriod|30000||
 |rejectTransactionMessage|false|y|
 |replyThreadPoolQueueCapacity|10000||
-|rocketmqHome|||
+|rocketmqHome|${ROCKETMQ_HOME}||
 |sendMessageThreadPoolNums|4||
 |sendThreadPoolQueueCapacity|10000||
 |shortPollingTimeMills|1000||
