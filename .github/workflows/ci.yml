@@ -51,10 +51,12 @@ jobs:
           sudo apt-get -y install build-essential ca-certificates curl jq gnupg2 ca-certificates psmisc procps xz-utils rsync aria2
 
 
-      - name: Set up JDK 8
+      - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
-          java-version: '8'
+          java-version: |
+            8
+            21
           distribution: 'temurin'
           cache: maven
       - name: Build with Maven

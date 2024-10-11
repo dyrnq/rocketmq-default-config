@@ -62,6 +62,9 @@ function genConfig() {
         fi
         done
 
+        if [ -n "${JAVA_HOME_8_X64}" ]; then
+          sed -i "s@export JAVA_HOME@export JAVA_HOME=${JAVA_HOME_8_X64}@" ${rocketmq_path}/bin/./tools.sh
+        fi
         mqadmin_subcommands=$(${rocketmq_path}/bin/./mqadmin | grep '^[[:space:]]' | awk '{print $1}')
         cat </dev/null > $SCRIPT_DIR/$rocketmq_ver/mqadmin.md
         (
