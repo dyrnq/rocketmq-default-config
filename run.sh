@@ -62,7 +62,38 @@ function genConfig() {
         fi
         done
 
+        mqadmin_subcommands=$(${rocketmq_path}/bin/./mqadmin | grep '^[[:space:]]' | awk '{print $1}')
+        cat </dev/null > $SCRIPT_DIR/$rocketmq_ver/mqadmin.md
+        (
+        echo "# mqadmin"
+        echo ""
+        echo "<!-- TOC -->"
+        ) >> $SCRIPT_DIR/$rocketmq_ver/mqadmin.md
+        
+        for subcommand in $mqadmin_subcommands; do
+            echo "- [${subcommand}](#${subcommand}) " >> $SCRIPT_DIR/$rocketmq_ver/mqadmin.md
+        done
 
+        (
+        echo ""
+        echo "<!-- /TOC -->"
+        echo ""
+        ) >> $SCRIPT_DIR/$rocketmq_ver/mqadmin.md
+
+        for subcommand in $mqadmin_subcommands; do
+            (
+                echo ""
+                echo "## ${subcommand}"
+                echo ""
+                echo "\`\`\`bash"
+                    ${rocketmq_path}/bin/./mqadmin help ${subcommand}
+                echo "\`\`\`"
+            )>> $SCRIPT_DIR/$rocketmq_ver/mqadmin.md
+        done
+
+        (
+        echo ""
+        ) >> $SCRIPT_DIR/$rocketmq_ver/mqadmin.md
           
     rm -rf "${rocketmq_path}"
     rm -rf rocketmq-all-${rocketmq_ver}-bin-release.zip
