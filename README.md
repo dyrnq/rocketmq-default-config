@@ -10,7 +10,7 @@ To solve similar problems like [Documentation Related: Is there a page listing a
 - [org.apache.rocketmq.common.ControllerConfig](https://github.com/apache/rocketmq/blob/rocketmq-all-5.3.0/common/src/main/java/org/apache/rocketmq/common/ControllerConfig.java)
 - [org.apache.rocketmq.common.JraftConfig](https://github.com/apache/rocketmq/blob/rocketmq-all-5.3.0/common/src/main/java/org/apache/rocketmq/common/JraftConfig.java)
 - [org.apache.rocketmq.proxy.config.ProxyConfig](https://github.com/apache/rocketmq/blob/rocketmq-all-5.3.0/proxy/src/main/java/org/apache/rocketmq/proxy/config/ProxyConfig.java)
-
+- [org.apache.rocketmq.auth.config.AuthConfig](https://github.com/apache/rocketmq/blob/rocketmq-all-5.3.0/auth/src/main/java/org/apache/rocketmq/auth/config/AuthConfig.java)
 
 ## config
 
@@ -130,6 +130,8 @@ To solve similar problems like [Documentation Related: Is there a page listing a
   - [5.2.0/proxy.json](5.2.0/proxy.json)
   - [5.2.0/proxy.md](5.2.0/proxy.md)
 - [5.3.0](#5-3-0)
+  - [5.3.0/auth.conf](5.3.0/auth.conf)
+  - [5.3.0/auth.md](5.3.0/auth.md)
   - [5.3.0/broker.conf](5.3.0/broker.conf)
   - [5.3.0/broker.md](5.3.0/broker.md)
   - [5.3.0/controller.conf](5.3.0/controller.conf)
@@ -140,6 +142,8 @@ To solve similar problems like [Documentation Related: Is there a page listing a
   - [5.3.0/proxy.json](5.3.0/proxy.json)
   - [5.3.0/proxy.md](5.3.0/proxy.md)
 - [5.3.1](#5-3-1)
+  - [5.3.1/auth.conf](5.3.1/auth.conf)
+  - [5.3.1/auth.md](5.3.1/auth.md)
   - [5.3.1/broker.conf](5.3.1/broker.conf)
   - [5.3.1/broker.md](5.3.1/broker.md)
   - [5.3.1/controller.conf](5.3.1/controller.conf)
