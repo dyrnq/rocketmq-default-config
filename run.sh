@@ -33,6 +33,7 @@ function genConfig() {
         NamesrvConfig_java="https://github.com/apache/rocketmq/raw/rocketmq-all-${rocketmq_ver}/common/src/main/java/org/apache/rocketmq/common/namesrv/NamesrvConfig.java"
         ControllerConfig_java="https://github.com/apache/rocketmq/raw/rocketmq-all-${rocketmq_ver}/common/src/main/java/org/apache/rocketmq/common/ControllerConfig.java"
         JraftConfig_java="https://github.com/apache/rocketmq/raw/rocketmq-all-${rocketmq_ver}/common/src/main/java/org/apache/rocketmq/common/JraftConfig.java"
+        AuthConfig_java="https://github.com/apache/rocketmq/blob/rocketmq-all-${rocketmq_ver}/auth/src/main/java/org/apache/rocketmq/auth/config/AuthConfig.java"
 
         if [ -z "${JAVA_HOME_8_X64}" ]; then
           BrokerConfig_java="${BrokerConfig_java/github.com/ghp.ci/github.com}"
@@ -40,6 +41,7 @@ function genConfig() {
           NamesrvConfig_java="${NamesrvConfig_java/github.com/ghp.ci/github.com}"
           ControllerConfig_java="${ControllerConfig_java/github.com/ghp.ci/github.com}"
           JraftConfig_java="${JraftConfig_java/github.com/ghp.ci/github.com}"
+          AuthConfig_java="${AuthConfig_java/github.com/ghp.ci/github.com}"
         fi
 
         if command -v aria2c >/dev/null 2>&1; then
@@ -62,7 +64,7 @@ function genConfig() {
 
         cp -f "$SCRIPT_DIR"/target/rocketmq-default-config-0.0.1-SNAPSHOT.jar "${rocketmq_path}"/lib/
 
-        for x in "org.apache.rocketmq.common.namesrv.NamesrvConfig:namesrv" "org.apache.rocketmq.common.BrokerConfig:broker" "org.apache.rocketmq.common.ControllerConfig:controller" "org.apache.rocketmq.proxy.config.ProxyConfig:proxy"; do
+        for x in "org.apache.rocketmq.auth.config.AuthConfig:auth" "org.apache.rocketmq.common.namesrv.NamesrvConfig:namesrv" "org.apache.rocketmq.common.BrokerConfig:broker" "org.apache.rocketmq.common.ControllerConfig:controller" "org.apache.rocketmq.proxy.config.ProxyConfig:proxy"; do
         className=$(cut -d: -f1 <<< "${x}")
         fileName=$(cut -d: -f2 <<< "${x}")
         lastName=$(echo "${className}" | rev | cut -d. -f1 | rev)
