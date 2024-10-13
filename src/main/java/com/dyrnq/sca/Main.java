@@ -184,6 +184,21 @@ public class Main {
             unsortedMap.put("processReadEvent", unsortedMap.get("isProcessReadEvent"));
             unsortedMap.remove("isProcessReadEvent");
         }
+        //MessageStoreConfig
+        if ("org.apache.rocketmq.common.BrokerConfig".equalsIgnoreCase(className)) {
+
+            String MessageStoreConfigURL = null;
+            if (configUrl != null) {
+                MessageStoreConfigURL = StrUtil.replace(configUrl, "common/src/main/java/org/apache/rocketmq/common/BrokerConfig.java", "store/src/main/java/org/apache/rocketmq/store/config/MessageStoreConfig.java");
+            } else {
+                MessageStoreConfigURL = null;
+            }
+            Map<String, Tuple4<Class<?>, Object, Boolean, String>> messageStoreConfig = grabMap("org.apache.rocketmq.store.config.MessageStoreConfig", MessageStoreConfigURL);
+            for (Map.Entry<String, Tuple4<Class<?>, Object, Boolean, String>> entry : messageStoreConfig.entrySet()) {
+                unsortedMap.put(entry.getKey(), entry.getValue());
+            }
+
+        }
 
         Map<String, Tuple4<Class<?>, Object, Boolean, String>> sortedMap = new TreeMap<>(unsortedMap);
         return sortedMap;

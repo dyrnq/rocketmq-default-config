@@ -33,7 +33,9 @@ function genConfig() {
         NamesrvConfig_java="https://github.com/apache/rocketmq/raw/rocketmq-all-${rocketmq_ver}/common/src/main/java/org/apache/rocketmq/common/namesrv/NamesrvConfig.java"
         ControllerConfig_java="https://github.com/apache/rocketmq/raw/rocketmq-all-${rocketmq_ver}/common/src/main/java/org/apache/rocketmq/common/ControllerConfig.java"
         JraftConfig_java="https://github.com/apache/rocketmq/raw/rocketmq-all-${rocketmq_ver}/common/src/main/java/org/apache/rocketmq/common/JraftConfig.java"
-        AuthConfig_java="https://github.com/apache/rocketmq/blob/rocketmq-all-${rocketmq_ver}/auth/src/main/java/org/apache/rocketmq/auth/config/AuthConfig.java"
+        AuthConfig_java="https://github.com/apache/rocketmq/raw/rocketmq-all-${rocketmq_ver}/auth/src/main/java/org/apache/rocketmq/auth/config/AuthConfig.java"
+        MessageStoreConfig_java="https://github.com/apache/rocketmq/raw/rocketmq-all-${rocketmq_ver}/store/src/main/java/org/apache/rocketmq/store/config/MessageStoreConfig.java"
+
 
         if [ -z "${JAVA_HOME_8_X64}" ]; then
           BrokerConfig_java="${BrokerConfig_java/github.com/ghp.ci/github.com}"
@@ -42,6 +44,7 @@ function genConfig() {
           ControllerConfig_java="${ControllerConfig_java/github.com/ghp.ci/github.com}"
           JraftConfig_java="${JraftConfig_java/github.com/ghp.ci/github.com}"
           AuthConfig_java="${AuthConfig_java/github.com/ghp.ci/github.com}"
+          MessageStoreConfig_java="${MessageStoreConfig_java/github.com/ghp.ci/github.com}"
         fi
 
         if command -v aria2c >/dev/null 2>&1; then
