@@ -7,6 +7,7 @@ To solve similar problems like [Documentation Related: Is there a page listing a
 
 - [org.apache.rocketmq.common.NamesrvConfig](https://github.com/apache/rocketmq/blob/rocketmq-all-5.3.0/common/src/main/java/org/apache/rocketmq/common/namesrv/NamesrvConfig.java)
 - [org.apache.rocketmq.common.BrokerConfig](https://github.com/apache/rocketmq/blob/rocketmq-all-5.3.0/common/src/main/java/org/apache/rocketmq/common/BrokerConfig.java)
+- [org.apache.rocketmq.store.config.MessageStoreConfig](https://github.com/apache/rocketmq/raw/rocketmq-all-5.3.0/store/src/main/java/org/apache/rocketmq/store/config/MessageStoreConfig.java)
 - [org.apache.rocketmq.common.ControllerConfig](https://github.com/apache/rocketmq/blob/rocketmq-all-5.3.0/common/src/main/java/org/apache/rocketmq/common/ControllerConfig.java)
 - [org.apache.rocketmq.common.JraftConfig](https://github.com/apache/rocketmq/blob/rocketmq-all-5.3.0/common/src/main/java/org/apache/rocketmq/common/JraftConfig.java)
 - [org.apache.rocketmq.proxy.config.ProxyConfig](https://github.com/apache/rocketmq/blob/rocketmq-all-5.3.0/proxy/src/main/java/org/apache/rocketmq/proxy/config/ProxyConfig.java)
