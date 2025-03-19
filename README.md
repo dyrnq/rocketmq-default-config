@@ -154,6 +154,18 @@ To solve similar problems like [Documentation Related: Is there a page listing a
   - [5.3.1/namesrv.md](5.3.1/namesrv.md)
   - [5.3.1/proxy.json](5.3.1/proxy.json)
   - [5.3.1/proxy.md](5.3.1/proxy.md)
+- [5.3.2](#5-3-2)
+  - [5.3.2/auth.conf](5.3.2/auth.conf)
+  - [5.3.2/auth.md](5.3.2/auth.md)
+  - [5.3.2/broker.conf](5.3.2/broker.conf)
+  - [5.3.2/broker.md](5.3.2/broker.md)
+  - [5.3.2/controller.conf](5.3.2/controller.conf)
+  - [5.3.2/controller.md](5.3.2/controller.md)
+  - [5.3.2/mqadmin.md](5.3.2/mqadmin.md)
+  - [5.3.2/namesrv.conf](5.3.2/namesrv.conf)
+  - [5.3.2/namesrv.md](5.3.2/namesrv.md)
+  - [5.3.2/proxy.json](5.3.2/proxy.json)
+  - [5.3.2/proxy.md](5.3.2/proxy.md)
 <!-- /TOC -->
 
 ## build and run local
