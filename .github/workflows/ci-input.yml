@@ -71,7 +71,7 @@ jobs:
       - name: Bash run
         run: |
           ver="${{ github.event.inputs.version }}"
-          bash ./run.sh ${ver}
+          bash ./run.sh --ver ${ver}
           echo 'action_state<<EOF' >> $GITHUB_ENV
           git status -s -u | awk '{print $2}' | xargs -r >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
