@@ -1,0 +1,90 @@
+name: ci-input
+
+on:
+  # push:
+  #   branches: [ "main" ]
+  #   paths-ignore:
+  #     - '[0-9]+(\.[0-9]+){2}/**'
+  #     - README.md
+  # pull_request:
+  #   branches: [ "main" ]
+  #   paths-ignore:
+  #     - '[0-9]+(\.[0-9]+){2}/**'
+  #     - README.md
+#  schedule:
+#    - cron:  '0 */8 * * *'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'version to build'
+        required: true
+        default: '5.3.3'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # strategy:
+    #     fail-fast: false
+    #     matrix:
+    #       vers:
+    #       - "4.9.8"
+    #       - "4.9.7"
+    #       - "4.9.6"
+    #       - "4.9.5"
+    #       - "4.9.4"
+    #       - "4.9.3"
+    #       - "4.9.2"
+    #       - "4.9.1"
+    #       - "4.9.0"
+    #       - "4.8.0"
+    #       - "5.0.0"
+    #       - "5.1.0"
+    #       - "5.1.1"
+    #       - "5.1.2"
+    #       - "5.1.3"
+    #       - "5.1.4"
+    #       - "5.2.0"
+    #       - "5.3.0"
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get -y update
+          sudo apt-get -y install build-essential ca-certificates curl jq gnupg2 ca-certificates psmisc procps xz-utils rsync aria2
+
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: |
+            8
+            21
+          distribution: 'temurin'
+          cache: maven
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml -Dmaven.test.skip=true
+
+
+      - name: Bash run
+        run: |
+          ver="${{ github.event.inputs.version }}"
+          bash ./run.sh ${ver}
+          echo 'action_state<<EOF' >> $GITHUB_ENV
+          git status -s -u | awk '{print $2}' | xargs -r >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+
+      - name: Use the value
+        id: step_two
+        run: |
+          echo "${{ env.action_state }}"
+
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          author_name: dyrnq
+          author_email: dyrnq@qq.com
+          message: '${{ env.action_state }}'
+          add: '["*.md", "*.conf", "*.json"]'
